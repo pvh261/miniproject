@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost Animation</title>
+</head>
+<body>
+    <svg id="canvas" viewbox="0 0 1920 1080" width="1920" height="1080">
+    </svg>
+    <script>
+        let canvas = document.getElementsByTagName("svg")[0];
+        let ghosts = [];
+        let colors = ["red", "green", "blue", "yellow", "cyan", "magenta", "black", "purple", "orange"];
+        let eyeRadius = 20;
+        let pupilRadius = 10;
+        let headRadius = 60;
+        let bodyWidth = 2 * headRadius;
+        let bodyHeight = 100;
+        let eyeSpacing = 25; //from center of head
+        let xMouse = 200
+        let yMouse = 200
+
+        //You'll need to create two event listeners.
+        canvas.addEventListener("click", createGhost, false)
+        canvas.addEventListener("mousemove", mouseCord, false)
+
+        let move = setInterval(moveEyes,30)
+
+        function mouseCord(event) {
+            xMouse = event.offsetX
+            yMouse = event.offsetY 
+        }
+
+        function createCircle(x, y, r) {
+            let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle")
+            circle.setAttribute("cx", x)
+            circle.setAttribute("cy", y)
+            circle.setAttribute("r", r)
+            return circle
+        }
+
+        function drawGhost(x, y) {
+            let eyesColor =  "rgb("+Math.floor(Math.random()*255)+","+Math.floor(Math.random()*255)+","+Math.floor(Math.random()*255)+")"
+            let ghost = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+            let body = document.createElementNS("http://www.w3.org/2000/svg", "rect")
+            body.setAttribute("width", bodyWidth)
+            body.setAttribute("height", bodyHeight)
+            body.setAttribute("x", 0)
+            body.setAttribute("y", 60)
+            let head = createCircle(60,60,60)
+            let eye1 = createCircle(35,60,20)
+            let eye2 = createCircle(85,60,20)
+            let pupil1 = createCircle(40,60,10)
+            let pupil2 = createCircle(90,60,10)
+            let circle1 = createCircle(20,160,20)
+            let circle2 = createCircle(60,160,20)
+            let circle3 = createCircle(100,160,20)
+            eye1.setAttribute("fill", "white")
+            pupil1.setAttribute("fill", eyesColor)
+            pupil1.setAttribute("class", "pupil1")
+            eye2.setAttribute("fill", "white")
+            pupil2.setAttribute("fill", eyesColor)
+            pupil2.setAttribute("class", "pupil2")
+            ghost.append(head,body)
+            ghost.append(eye1, eye2)
+            ghost.append(pupil1,pupil2)
+            ghost.append(circle1,circle2,circle3)
+            ghost.setAttribute("x", x)
+            ghost.setAttribute("y",y)
+            ghost.setAttribute("fill", "rgb("+Math.floor(Math.random()*255)+","+Math.floor(Math.random()*255)+","+Math.floor(Math.random()*255)+")")
+            return ghost
+        }
+
+        function createGhost(event) {
+            let x = event.offsetX-60
+            let y = event.offsetY-60
+            let ghost = drawGhost(Math.round(x),Math.round(y))
+            ghosts.push(ghost)
+            canvas.appendChild(ghost)
+        }   
+        /* You'll need a click event listener on the canvas that draws a randomly
+        colored ghost at the precise location of the click and places a JavaScript
+        reference to that ghost into the ghosts array*/
+
+        /* You'll need a mousemove listener on the canvas that makes the eyes
+        of each ghost in the ghosts array move in the direction of the current
+        mouse coordinates */
+        function moveEyes() {
+            for (ghost of ghosts) {
+                for (let i = 1; i < 3; i++) {
+                    let eye = ghost.getElementsByTagName("circle")[i]
+                    let pupil = ghost.getElementsByTagName("circle")[i+2]
+                    let cx = Number(eye.getAttribute("cx"))+Number(ghost.getAttribute("x"))
+                    let cy = Number(eye.getAttribute("cy"))+Number(ghost.getAttribute("y"))
+                    let distance = Math.sqrt(Math.pow(cx-xMouse,2)+Math.pow(cy-yMouse,2))
+                    let dx = Number(eye.getAttribute("cx"))+(xMouse-cx)*(10)/distance
+                    let dy = Number(eye.getAttribute("cy"))+(yMouse-cy)*(10)/distance
+                    pupil.setAttribute("cx", dx)
+                    pupil.setAttribute("cy", dy)
+                }
+            }
+    }
+    </script>
+</body>
+</html>
